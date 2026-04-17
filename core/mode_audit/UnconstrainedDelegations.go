@@ -60,7 +60,7 @@ func AuditUnconstrainedDelegations(ldapHost string, ldapPort int, creds *credent
 			auditString := ""
 			if userAccountControl&int(ldap_attributes.UAF_SERVER_TRUST_ACCOUNT) == int(ldap_attributes.UAF_SERVER_TRUST_ACCOUNT) {
 				auditString = "(\x1b[92mLegitimate\x1b[0m: DC)"
-			} else if userAccountControl&int(ldap_attributes.UAF_PARTIAL_SECRETS_ACCOUNT) == int(ldap_attributes.UAF_SERVER_TRUST_ACCOUNT) {
+			} else if userAccountControl&int(ldap_attributes.UAF_PARTIAL_SECRETS_ACCOUNT) == int(ldap_attributes.UAF_PARTIAL_SECRETS_ACCOUNT) {
 				auditString = "(\x1b[91mSuspicious\x1b[0m: RODCs do not have unconstrained delegation by default)"
 			} else {
 				auditString = "(\x1b[91mSuspicious\x1b[0m)"
