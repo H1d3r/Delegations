@@ -79,15 +79,15 @@ func FindRessourceBasedConstrainedDelegations(ldapHost string, ldapPort int, cre
 			if err != nil {
 				return fmt.Errorf("error creating security descriptor: %s", err)
 			}
-			for entryIndex, entry := range ntSecurityDescriptor.DACL.Entries {
+			for aceIndex, ace := range ntSecurityDescriptor.DACL.Entries {
 				var separator string
-				if entryIndex < len(ntSecurityDescriptor.DACL.Entries)-1 {
+				if aceIndex < len(ntSecurityDescriptor.DACL.Entries)-1 {
 					separator = "├──"
 				} else {
 					separator = "└──"
 				}
 
-				sidString := entry.Identity.SID.ToString()
+				sidString := ace.Identity.SID.ToString()
 				distingushedName, err := utils.LookupSID(&ldapSession, sidString)
 
 				// Format the string depending on if the SID lookup failed or not
