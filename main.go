@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 
-	"github.com/TheManticoreProject/Delegations/core/mode_add"
-	"github.com/TheManticoreProject/Delegations/core/mode_audit"
-	"github.com/TheManticoreProject/Delegations/core/mode_clear"
-	"github.com/TheManticoreProject/Delegations/core/mode_find"
-	"github.com/TheManticoreProject/Delegations/core/mode_monitor"
-	"github.com/TheManticoreProject/Delegations/core/mode_remove"
+	"github.com/TheManticoreProject/Delegations/mode_add"
+	"github.com/TheManticoreProject/Delegations/mode_audit"
+	"github.com/TheManticoreProject/Delegations/mode_clear"
+	"github.com/TheManticoreProject/Delegations/mode_find"
+	"github.com/TheManticoreProject/Delegations/mode_monitor"
+	"github.com/TheManticoreProject/Delegations/mode_remove"
 	"github.com/TheManticoreProject/Manticore/logger"
 	"github.com/TheManticoreProject/Manticore/windows/credentials"
 	"github.com/TheManticoreProject/goopts/parser"
@@ -19,7 +19,8 @@ var (
 	delegationType string
 
 	// Configuration
-	debug bool
+	debug            bool
+	ignoreLegitimate bool
 
 	// Delegations
 	withProtocolTransition                bool
@@ -43,7 +44,7 @@ var (
 
 func parseArgs() {
 	ap := parser.ArgumentsParser{
-		Banner: "Delegations - by Remi GASCOU (Podalirius) @ TheManticoreProject - v1.0.0",
+		Banner: "Delegations - by Remi GASCOU (Podalirius) @ TheManticoreProject - v1.0.1",
 	}
 	ap.SetupSubParsing("mode", &mode, true)
 	ap.SetOptShowBannerOnHelp(true)
@@ -162,6 +163,7 @@ func parseArgs() {
 	} else {
 		subparser_audit_group_config.NewBoolArgument(&debug, "", "--debug", false, "Debug mode.")
 		subparser_audit_group_config.NewStringArgument(&distinguishedName, "-D", "--distinguished-name", "", false, "Distinguished name of the computer, user or group to audit for delegations.")
+		subparser_audit_group_config.NewBoolArgument(&ignoreLegitimate, "-I", "--ignore-legitimate", false, "Ignore legitimate delegations, keep only suspicious ones.")
 	}
 	// LDAP Connection Settings
 	subparser_audit_group_ldapSettings, err := subparser_audit.NewArgumentGroup("LDAP Connection Settings")
@@ -634,19 +636,19 @@ func main() {
 		}
 
 	} else if mode == "audit" {
-		err = mode_audit.AuditUnconstrainedDelegations(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
+		err = mode_audit.AuditUnconstrainedDelegations(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug, ignoreLegitimate)
 		if err != nil {
 			logger.Warn(fmt.Sprintf("Error auditing unconstrained delegations: %s", err))
 		}
-		err = mode_audit.AuditConstrainedDelegations(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
+		err = mode_audit.AuditConstrainedDelegations(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug, ignoreLegitimate)
 		if err != nil {
 			logger.Warn(fmt.Sprintf("Error auditing constrained delegations: %s", err))
 		}
-		err = mode_audit.AuditConstrainedDelegationsWithProtocolTransition(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
+		err = mode_audit.AuditConstrainedDelegationsWithProtocolTransition(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug, ignoreLegitimate)
 		if err != nil {
 			logger.Warn(fmt.Sprintf("Error auditing constrained delegations with protocol transition: %s", err))
 		}
-		err = mode_audit.AuditRessourceBasedConstrainedDelegations(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
+		err = mode_audit.AuditRessourceBasedConstrainedDelegations(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug, ignoreLegitimate)
 		if err != nil {
 			logger.Warn(fmt.Sprintf("Error auditing ressource-based constrained delegations: %s", err))
 		}
