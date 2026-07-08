@@ -3,14 +3,14 @@ package mode_audit
 import (
 	"fmt"
 
-	"github.com/TheManticoreProject/Delegations/core/utils"
+	"github.com/TheManticoreProject/Delegations/utils"
 	"github.com/TheManticoreProject/Manticore/logger"
 	"github.com/TheManticoreProject/Manticore/network/ldap"
 	"github.com/TheManticoreProject/Manticore/network/ldap/ldap_attributes"
 	"github.com/TheManticoreProject/Manticore/windows/credentials"
 )
 
-// AuditConstrainedDelegations retrieves constrained delegations for a given domain controller.
+// AuditConstrainedDelegationsWithProtocolTransition retrieves constrained delegations with protocol transition for a given domain controller.
 //
 // Parameters:
 //
@@ -24,7 +24,7 @@ import (
 // Returns:
 //
 //	An error if the operation fails, nil otherwise.
-func AuditConstrainedDelegations(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, debug bool) error {
+func AuditConstrainedDelegationsWithProtocolTransition(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, debug bool, ignoreLegitimate bool) error {
 	ldapSession := ldap.Session{}
 	ldapSession.InitSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
 	success, err := ldapSession.Connect()
@@ -42,8 +42,8 @@ func AuditConstrainedDelegations(ldapHost string, ldapPort int, creds *credentia
 	}
 	// Searching for non empty msDS-AllowedToDelegateTo attribute
 	query += "(msDS-AllowedToDelegateTo=*)"
-	// With the userAccountControl attribute cleared of the flag UAF_TRUSTED_TO_AUTH_FOR_DELEGATION set (protocol transition disabled)
-	query += fmt.Sprintf("(!(userAccountControl:1.2.840.113556.1.4.803:=%d))", ldap_attributes.UAF_TRUSTED_TO_AUTH_FOR_DELEGATION)
+	// With the userAccountControl attribute with the flag UAF_TRUSTED_TO_AUTH_FOR_DELEGATION set (protocol transition enabled)
+	query += fmt.Sprintf("(userAccountControl:1.2.840.113556.1.4.803:=%d)", ldap_attributes.UAF_TRUSTED_TO_AUTH_FOR_DELEGATION)
 	// Closing the second AND
 	query += ")"
 	// Closing the first AND
@@ -54,7 +54,7 @@ func AuditConstrainedDelegations(ldapHost string, ldapPort int, creds *credentia
 	}
 
 	if len(searchResults) != 0 {
-		logger.Print(fmt.Sprintf("[>] Constrained Delegations (\x1b[93m%d\x1b[0m):", len(searchResults)))
+		logger.Print(fmt.Sprintf("[>] Constrained Delegations with Protocol Transition (\x1b[93m%d\x1b[0m):", len(searchResults)))
 		for entryIndex, entry := range searchResults {
 			if entryIndex < len(searchResults)-1 {
 				logger.Print(fmt.Sprintf("  ├── \x1b[94m%s\x1b[0m", entry.DN))
@@ -94,7 +94,7 @@ func AuditConstrainedDelegations(ldapHost string, ldapPort int, creds *credentia
 		}
 		logger.Print("")
 	} else {
-		logger.Print("[>] Constrained Delegations (0)")
+		logger.Print("[>] Constrained Delegations with Protocol Transition (0)")
 	}
 
 	ldapSession.Close()

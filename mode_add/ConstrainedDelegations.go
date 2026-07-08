@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/TheManticoreProject/Delegations/core/mode_remove"
+	"github.com/TheManticoreProject/Delegations/mode_remove"
 	"github.com/TheManticoreProject/Manticore/logger"
 	"github.com/TheManticoreProject/Manticore/network/ldap"
 	"github.com/TheManticoreProject/Manticore/windows/credentials"
