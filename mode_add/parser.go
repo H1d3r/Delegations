@@ -22,7 +22,7 @@ func SetupSubParser(ap *parser.ArgumentsParser, delegationType *string, debug, w
 	}
 	cli.RegisterConnectionGroups(constrained, domainController, ldapPort, useLdaps, useKerberos, authDomain, authUsername, authPassword, authHashes)
 
-	rbcd := addParser.AddSubParser("rbcd", "Add a ressource-based delegation to a computer, user or group.")
+	rbcd := addParser.AddSubParser("rbcd", "Add a resource-based delegation to a computer, user or group.")
 	if config := cli.NewConfigurationGroup(rbcd); config != nil {
 		config.NewBoolArgument(debug, "", "--debug", false, "Debug mode.")
 		config.NewStringArgument(distinguishedName, "-D", "--distinguished-name", "", true, "Distinguished name of the user or group to add the delegation to.")

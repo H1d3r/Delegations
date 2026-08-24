@@ -39,8 +39,8 @@ func Run(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps
 		logger.Warn(fmt.Sprintf("Error auditing constrained delegations with protocol transition: %s", err))
 		auditErrors = append(auditErrors, err)
 	}
-	if err := AuditRessourceBasedConstrainedDelegations(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug); err != nil {
-		logger.Warn(fmt.Sprintf("Error auditing ressource-based constrained delegations: %s", err))
+	if err := AuditResourceBasedConstrainedDelegations(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug); err != nil {
+		logger.Warn(fmt.Sprintf("Error auditing resource-based constrained delegations: %s", err))
 		auditErrors = append(auditErrors, err)
 	}
 

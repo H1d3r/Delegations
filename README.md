@@ -217,51 +217,50 @@ The protocol transition mode allows you to add or remove protocol transition for
 The first positional argument of the program is the mode:
 
 ```
-./Delegations 
-Delegations - by Remi GASCOU (Podalirius) @ TheManticoreProject - v1.0.0
+./Delegations
+Delegations - by Remi GASCOU (Podalirius) @ TheManticoreProject - v1.0.1
 
 Usage: Delegations <add|audit|clear|find|monitor|remove>
 
-   add      Add a constrained, unconstrained, or resource-based constrained delegation to a user or group.
+   add      Add a constrained, unconstrained, or resource-based constrained delegation to a computer, user or group.
    audit    Audit constrained, unconstrained, and resource-based constrained delegations in Active Directory.
-   clear    Clear a constrained, unconstrained, or resource-based constrained delegation from a user or group.
-   find     Find a constrained, unconstrained, or resource-based constrained delegation from a user or group.
+   clear    Clear a constrained, unconstrained, or resource-based constrained delegation from a computer, user or group.
+   find     Find a constrained, unconstrained, or resource-based constrained delegation from a computer, user or group.
    monitor  Monitor constrained, unconstrained, and resource-based constrained delegations in Active Directory.
-   remove   Remove a constrained, unconstrained, or resource-based constrained delegation from a user or group.
+   remove   Remove a constrained, unconstrained, or resource-based constrained delegation from a computer, user or group.
 ```
 
-Then for modes `add`, `remove` and `find`, the second positional argument is the delegation type:
+For modes `add`, `clear`, `find`, and `remove`, the second positional argument selects the delegation operation or type. For example:
 
 ```
-./Delegations add 
-Delegations - by Remi GASCOU (Podalirius) @ TheManticoreProject - v1.0.0
+./Delegations add
+Delegations - by Remi GASCOU (Podalirius) @ TheManticoreProject - v1.0.1
 
-Usage: Delegations add <constrained|rbcd|unconstrained>
+Usage: Delegations add <constrained|protocoltransition|rbcd|unconstrained>
 
-   constrained    Add a constrained delegation to a user or group.
-   unconstrained  Add a unconstrained delegation to a user or group.
-   rbcd           Add a ressource-based delegation to a user or group.
-
+   constrained         Add a constrained delegation to a computer, user or group.
+   protocoltransition  Add a protocol transition to a computer, user or group.
+   rbcd                Add a resource-based delegation to a computer, user or group.
+   unconstrained       Add a unconstrained delegation to a computer, user or group.
 ```
 
 For mode `audit` all delegation types are audited at once, no more positional arguments are needed, only options:
 
 ```
 ./Delegations audit
-Delegations - by Remi GASCOU (Podalirius) @ TheManticoreProject - v1.0.0
+Delegations - by Remi GASCOU (Podalirius) @ TheManticoreProject - v1.0.1
 
-Usage: Delegations audit --domain <string> --username <string> [--password <string>] [--hashes <string>] [--debug] --dc-ip <string> [--ldap-port <tcp port>] [--use-ldaps] [--use-kerberos]
-
+Usage: Delegations audit --domain <string> --username <string> [--password <string>] [--hashes <string>] [--debug] [--distinguished-name <string>] [--ignore-legitimate] --dc-ip <string> [--ldap-port <tcp port>] [--use-ldaps] [--use-kerberos]
 
   Authentication:
     -d, --domain <string>   Active Directory domain to authenticate to.
     -u, --username <string> User to authenticate as.
     -p, --password <string> Password to authenticate with. (default: "")
     -H, --hashes <string>   NT/LM hashes, format is LMhash:NThash. (default: "")
-
   Configuration:
-    -d, --debug     Debug mode. (default: false)
-
+    --debug                           Debug mode. (default: false)
+    -D, --distinguished-name <string> Distinguished name of the computer, user or group to audit for delegations. (default: "")
+    -I, --ignore-legitimate           Ignore legitimate unconstrained delegations, keep only suspicious ones. (default: false)
   LDAP Connection Settings:
     -dc, --dc-ip <string>       IP Address of the domain controller or KDC (Key Distribution Center) for Kerberos. If omitted, it will use the domain part (FQDN) specified in the identity parameter.
     -lp, --ldap-port <tcp port> Port number to connect to LDAP server. (default: 389)
@@ -275,4 +274,3 @@ Pull requests are welcome. Feel free to open an issue if you want to add other f
 
 ## Credits
   - [Remi GASCOU (Podalirius)](https://github.com/p0dalirius) for the creation of the [Delegations](https://github.com/p0dalirius/Delegations) project before transferring it to TheManticoreProject.
-

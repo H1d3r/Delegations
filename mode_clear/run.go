@@ -45,9 +45,9 @@ func Run(delegationType, ldapHost string, ldapPort int, creds *credentials.Crede
 			logger.Warn(fmt.Sprintf("Error clearing unconstrained delegation: %s", err))
 		}
 	case "rbcd":
-		err = ClearRessourceBasedConstrainedDelegation(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
+		err = ClearResourceBasedConstrainedDelegation(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
 		if err != nil {
-			logger.Warn(fmt.Sprintf("Error clearing ressource-based constrained delegation: %s", err))
+			logger.Warn(fmt.Sprintf("Error clearing resource-based constrained delegation: %s", err))
 		}
 	default:
 		return fmt.Errorf("invalid clear delegation type %q", delegationType)

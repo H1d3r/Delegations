@@ -29,7 +29,7 @@ func SetupSubParser(ap *parser.ArgumentsParser, delegationType *string, debug, w
 	}
 	cli.RegisterConnectionGroups(protocolTransition, domainController, ldapPort, useLdaps, useKerberos, authDomain, authUsername, authPassword, authHashes)
 
-	rbcd := removeParser.AddSubParser("rbcd", "Remove a ressource-based delegation to a computer, user or group.")
+	rbcd := removeParser.AddSubParser("rbcd", "Remove a resource-based delegation to a computer, user or group.")
 	if config := cli.NewConfigurationGroup(rbcd); config != nil {
 		config.NewBoolArgument(debug, "", "--debug", false, "Debug mode.")
 		config.NewStringArgument(distinguishedName, "-D", "--distinguished-name", "", true, "Distinguished name of the user or group to remove delegations on.")

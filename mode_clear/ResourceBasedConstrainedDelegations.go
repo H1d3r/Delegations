@@ -9,7 +9,7 @@ import (
 	"github.com/TheManticoreProject/Manticore/windows/credentials"
 )
 
-// ClearRessourceBasedConstrainedDelegation removes a ressource based constrained delegation from a user or computer account.
+// ClearResourceBasedConstrainedDelegation removes a resource based constrained delegation from a user or computer account.
 //
 //	Parameters:
 //		ldapHost (string): The LDAP host to connect to.
@@ -17,15 +17,17 @@ import (
 //		creds (*credentials.Credentials): The credentials to use for the LDAP connection.
 //		useLdaps (bool): Whether to use LDAPS for the LDAP connection.
 //		useKerberos (bool): Whether to use Kerberos for the LDAP connection.
-//		distinguishedName (string): The distinguished name of the user or computer account to remove the ressource based constrained delegation from.
+//		distinguishedName (string): The distinguished name of the user or computer account to remove the resource based constrained delegation from.
 //		allowedToActOnBehalfOfAnotherIdentity ([]string): The list of users or computers that the account is allowed to delegate to.
 //		debug (bool): A flag indicating whether to print debug information.
 //
 //	Returns:
 //		error: An error if the operation fails, nil otherwise.
-func ClearRessourceBasedConstrainedDelegation(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, debug bool) error {
-	ldapSession := ldap.Session{}
-	ldapSession.InitSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
+func ClearResourceBasedConstrainedDelegation(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, debug bool) error {
+	ldapSession, err := ldap.NewSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
+	if err != nil {
+		return fmt.Errorf("error creating LDAP session: %s", err)
+	}
 	success, err := ldapSession.Connect()
 	if !success {
 		return fmt.Errorf("error connecting to LDAP: %s", err)
@@ -47,7 +49,7 @@ func ClearRessourceBasedConstrainedDelegation(ldapHost string, ldapPort int, cre
 		return fmt.Errorf("error querying msDS-AllowedToActOnBehalfOfOtherIdentity: %s", err)
 	}
 
-	// Clear ressource based constrained delegation
+	// Clear resource based constrained delegation
 	if len(searchResults) > 0 {
 		values := searchResults[0].GetEqualFoldAttributeValues("msDS-AllowedToActOnBehalfOfOtherIdentity")
 
@@ -61,10 +63,10 @@ func ClearRessourceBasedConstrainedDelegation(ldapHost string, ldapPort int, cre
 			}
 		}
 
-		logger.Info(fmt.Sprintf("Ressource based constrained delegation cleared for %s", distinguishedName))
+		logger.Info(fmt.Sprintf("Resource based constrained delegation cleared for %s", distinguishedName))
 
 	} else {
-		return fmt.Errorf("could not find a computer, person or user having a ressource based constrained delegation for distinguished name: %s", distinguishedName)
+		return fmt.Errorf("could not find a computer, person or user having a resource based constrained delegation for distinguished name: %s", distinguishedName)
 	}
 
 	return nil

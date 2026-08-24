@@ -45,9 +45,9 @@ func Run(delegationType, ldapHost string, ldapPort int, creds *credentials.Crede
 			logger.Warn(fmt.Sprintf("Error finding unconstrained delegations: %s", err))
 		}
 	case "rbcd":
-		err = FindRessourceBasedConstrainedDelegations(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
+		err = FindResourceBasedConstrainedDelegations(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
 		if err != nil {
-			logger.Warn(fmt.Sprintf("Error finding ressource-based constrained delegations: %s", err))
+			logger.Warn(fmt.Sprintf("Error finding resource-based constrained delegations: %s", err))
 		}
 	default:
 		return fmt.Errorf("invalid find delegation type %q", delegationType)

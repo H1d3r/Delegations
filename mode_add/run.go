@@ -61,9 +61,9 @@ func Run(delegationType, ldapHost string, ldapPort int, creds *credentials.Crede
 		return err
 
 	case "rbcd":
-		err := AddRessourceBasedConstrainedDelegation(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, allowedToActOnBehalfOfAnotherIdentity, debug)
+		err := AddResourceBasedConstrainedDelegation(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, allowedToActOnBehalfOfAnotherIdentity, debug)
 		if err != nil {
-			logger.Warn(fmt.Sprintf("Error adding ressource-based constrained delegation: %s", err))
+			logger.Warn(fmt.Sprintf("Error adding resource-based constrained delegation: %s", err))
 		}
 		return err
 
