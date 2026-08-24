@@ -66,16 +66,15 @@ func ClearConstrainedDelegationWithProtocolTransition(ldapHost string, ldapPort 
 
 		if len(values) == 0 {
 			logger.Info(fmt.Sprintf("Attribute msDS-AllowedToDelegateTo is empty for %s", distinguishedName))
-			return nil
 		} else {
 			err = ldapSession.FlushAttributeValues(distinguishedName, "msDS-AllowedToDelegateTo")
 			if err != nil {
 				return fmt.Errorf("error clearing msDS-AllowedToDelegateTo: %s", err)
 			}
+		}
 
-			if err := mode_remove.RemoveProtocolTransition(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug); err != nil {
-				return fmt.Errorf("error removing protocol transition: %w", err)
-			}
+		if err := mode_remove.RemoveProtocolTransition(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug); err != nil {
+			return fmt.Errorf("error removing protocol transition: %w", err)
 		}
 
 		logger.Info(fmt.Sprintf("Constrained delegation with protocol transition cleared for %s", distinguishedName))
