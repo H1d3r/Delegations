@@ -57,7 +57,6 @@ func parseArgs() {
 
 	// subparser for add constrained delegation ========================================================================================
 	subparser_add_constrained := subparser_add.AddSubParser("constrained", "Add a constrained delegation to a computer, user or group.")
-	subparser_add_constrained.NewBoolArgument(&debug, "", "--debug", false, "Enable debug mode.")
 	// Configuration flags
 	subparser_add_constrained_group_config, err := subparser_add_constrained.NewArgumentGroup("Configuration")
 	if err != nil {
@@ -92,7 +91,6 @@ func parseArgs() {
 
 	// subparser for add ressource_based delegation ========================================================================================
 	subparser_add_ressource_based := subparser_add.AddSubParser("rbcd", "Add a ressource-based delegation to a computer, user or group.")
-	subparser_add_ressource_based.NewBoolArgument(&debug, "", "--debug", false, "Enable debug mode.")
 	// Configuration flags
 	subparser_add_ressource_based_group_config, err := subparser_add_ressource_based.NewArgumentGroup("Configuration")
 	if err != nil {
@@ -125,7 +123,6 @@ func parseArgs() {
 
 	// subparser for add unconstrained delegation ========================================================================================
 	subparser_add_unconstrained := subparser_add.AddSubParser("unconstrained", "Add a unconstrained delegation to a computer, user or group.")
-	subparser_add_unconstrained.NewBoolArgument(&debug, "", "--debug", false, "Enable debug mode.")
 	// Configuration flags
 	subparser_add_unconstrained_group_config, err := subparser_add_unconstrained.NewArgumentGroup("Configuration")
 	if err != nil {
@@ -193,7 +190,6 @@ func parseArgs() {
 
 	// subparser for clear constrained delegation ========================================================================================
 	subparser_clear_constrained := subparser_clear.AddSubParser("constrained", "Clear a constrained delegation to a computer, user or group.")
-	subparser_clear_constrained.NewBoolArgument(&debug, "", "--debug", false, "Enable debug mode.")
 	// Configuration flags
 	subparser_clear_constrained_group_config, err := subparser_clear_constrained.NewArgumentGroup("Configuration")
 	if err != nil {
@@ -226,7 +222,6 @@ func parseArgs() {
 
 	// subparser for clear ressource_based delegation ========================================================================================
 	subparser_clear_ressource_based := subparser_clear.AddSubParser("rbcd", "Clear a ressource-based delegation to a computer, user or group.")
-	subparser_clear_ressource_based.NewBoolArgument(&debug, "", "--debug", false, "Enable debug mode.")
 	// Configuration flags
 	subparser_clear_ressource_based_group_config, err := subparser_clear_ressource_based.NewArgumentGroup("Configuration")
 	if err != nil {
@@ -258,7 +253,6 @@ func parseArgs() {
 
 	// subparser for clear unconstrained delegation ========================================================================================
 	subparser_clear_unconstrained := subparser_clear.AddSubParser("unconstrained", "Clear a unconstrained delegation to a computer, user or group.")
-	subparser_clear_unconstrained.NewBoolArgument(&debug, "", "--debug", false, "Enable debug mode.")
 	// Configuration flags
 	subparser_clear_unconstrained_group_config, err := subparser_clear_unconstrained.NewArgumentGroup("Configuration")
 	if err != nil {
@@ -294,7 +288,6 @@ func parseArgs() {
 
 	// subparser for find constrained delegation ========================================================================================
 	subparser_find_constrained := subparser_find.AddSubParser("constrained", "Find a constrained delegation to a computer, user or group.")
-	subparser_find_constrained.NewBoolArgument(&debug, "", "--debug", false, "Enable debug mode.")
 	// Configuration flags
 	subparser_find_constrained_group_config, err := subparser_find_constrained.NewArgumentGroup("Configuration")
 	if err != nil {
@@ -327,7 +320,6 @@ func parseArgs() {
 
 	// Add subparser for add protocol transition ========================================================================================
 	subparser_add_protocoltransition := subparser_add.AddSubParser("protocoltransition", "Add a protocol transition to a computer, user or group.")
-	subparser_add_protocoltransition.NewBoolArgument(&debug, "", "--debug", false, "Enable debug mode.")
 	// Configuration flags
 	subparser_add_protocoltransition_group_config, err := subparser_add_protocoltransition.NewArgumentGroup("Configuration")
 	if err != nil {
@@ -359,7 +351,6 @@ func parseArgs() {
 
 	// Find subparser for find ressource_based delegation ========================================================================================
 	subparser_find_ressource_based := subparser_find.AddSubParser("rbcd", "Find a ressource-based delegation to a computer, user or group.")
-	subparser_find_ressource_based.NewBoolArgument(&debug, "", "--debug", false, "Enable debug mode.")
 	// Configuration flags
 	subparser_find_ressource_based_group_config, err := subparser_find_ressource_based.NewArgumentGroup("Configuration")
 	if err != nil {
@@ -391,7 +382,6 @@ func parseArgs() {
 
 	// Find subparser for find unconstrained delegation ========================================================================================
 	subparser_find_unconstrained := subparser_find.AddSubParser("unconstrained", "Find a unconstrained delegation to a computer, user or group.")
-	subparser_find_unconstrained.NewBoolArgument(&debug, "", "--debug", false, "Enable debug mode.")
 	// Configuration flags
 	subparser_find_unconstrained_group_config, err := subparser_find_unconstrained.NewArgumentGroup("Configuration")
 	if err != nil {
@@ -458,7 +448,6 @@ func parseArgs() {
 
 	// Remove subparser for remove constrained delegation ========================================================================================
 	subparser_remove_constrained := subparser_remove.AddSubParser("constrained", "Remove a constrained delegation to a computer, user or group.")
-	subparser_remove_constrained.NewBoolArgument(&debug, "", "--debug", false, "Enable debug mode.")
 	// Configuration flags
 	subparser_remove_constrained_group_config, err := subparser_remove_constrained.NewArgumentGroup("Configuration")
 	if err != nil {
@@ -493,7 +482,6 @@ func parseArgs() {
 
 	// Remove subparser for remove protocol transition ========================================================================================
 	subparser_remove_protocoltransition := subparser_remove.AddSubParser("protocoltransition", "Remove a protocol transition to a computer, user or group.")
-	subparser_remove_protocoltransition.NewBoolArgument(&debug, "", "--debug", false, "Enable debug mode.")
 	// Configuration flags
 	subparser_remove_protocoltransition_group_config, err := subparser_remove_protocoltransition.NewArgumentGroup("Configuration")
 	if err != nil {
@@ -525,7 +513,6 @@ func parseArgs() {
 
 	// Remove subparser for remove ressource_based delegation ========================================================================================
 	subparser_remove_ressource_based := subparser_remove.AddSubParser("rbcd", "Remove a ressource-based delegation to a computer, user or group.")
-	subparser_remove_ressource_based.NewBoolArgument(&debug, "", "--debug", false, "Enable debug mode.")
 	// Configuration flags
 	subparser_remove_ressource_based_group_config, err := subparser_remove_ressource_based.NewArgumentGroup("Configuration")
 	if err != nil {
@@ -558,7 +545,6 @@ func parseArgs() {
 
 	// Remove subparser for remove unconstrained delegation ========================================================================================
 	subparser_remove_unconstrained := subparser_remove.AddSubParser("unconstrained", "Remove a unconstrained delegation to a computer, user or group.")
-	subparser_remove_unconstrained.NewBoolArgument(&debug, "", "--debug", false, "Enable debug mode.")
 	// Configuration flags
 	subparser_remove_unconstrained_group_config, err := subparser_remove_unconstrained.NewArgumentGroup("Configuration")
 	if err != nil {
