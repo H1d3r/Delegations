@@ -1,4 +1,4 @@
-package mode_remove
+package mode_add
 
 import (
 	"bytes"
@@ -11,7 +11,7 @@ import (
 	"github.com/TheManticoreProject/Manticore/windows/credentials"
 )
 
-// RemoveRessourceBasedConstrainedDelegation removes a ressource based constrained delegation from a user or computer account.
+// AddResourceBasedConstrainedDelegation adds a resource based constrained delegation to a user or computer account.
 //
 //	Parameters:
 //		ldapHost (string): The LDAP host to connect to.
@@ -19,13 +19,13 @@ import (
 //		creds (*credentials.Credentials): The credentials to use for the LDAP connection.
 //		useLdaps (bool): Whether to use LDAPS for the LDAP connection.
 //		useKerberos (bool): Whether to use Kerberos for the LDAP connection.
-//		distinguishedName (string): The distinguished name of the user or computer account to remove the ressource based constrained delegation from.
+//		distinguishedName (string): The distinguished name of the user or computer account to add the resource based constrained delegation to.
 //		allowedToActOnBehalfOfAnotherIdentity ([]string): The list of users or computers that the account is allowed to delegate to.
 //		debug (bool): A flag indicating whether to print debug information.
 //
 //	Returns:
 //		error: An error if the operation fails, nil otherwise.
-func RemoveRessourceBasedConstrainedDelegation(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, allowedToActOnBehalfOfAnotherIdentity []string, debug bool) error {
+func AddResourceBasedConstrainedDelegation(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, allowedToActOnBehalfOfAnotherIdentity []string, debug bool) error {
 	ldapSession := ldap.Session{}
 	ldapSession.InitSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
 	success, err := ldapSession.Connect()
@@ -43,12 +43,13 @@ func RemoveRessourceBasedConstrainedDelegation(ldapHost string, ldapPort int, cr
 		return fmt.Errorf("could not find an object with distinguished name: %s", distinguishedName)
 	}
 
-	searchResults, err := ldapSession.QueryWholeSubtree("", fmt.Sprintf("(distinguishedName=%s)", utils.EscapeLDAPFilterValue(distinguishedName)), []string{"msDS-AllowedToActOnBehalfOfOtherIdentity"})
+	searchQuery := fmt.Sprintf("(distinguishedName=%s)", utils.EscapeLDAPFilterValue(distinguishedName))
+	searchAttributes := []string{"msDS-AllowedToActOnBehalfOfOtherIdentity"}
+	searchResults, err := ldapSession.QueryWholeSubtree("", searchQuery, searchAttributes)
 	if err != nil {
 		return fmt.Errorf("error querying msDS-AllowedToActOnBehalfOfOtherIdentity: %s", err)
 	}
 
-	// Remove ressource based constrained delegation
 	if len(searchResults) > 0 {
 		existingValues := searchResults[0].GetEqualFoldAttributeValues("msDS-AllowedToActOnBehalfOfOtherIdentity")
 		if len(existingValues) > 1 {
@@ -59,34 +60,27 @@ func RemoveRessourceBasedConstrainedDelegation(ldapHost string, ldapPort int, cr
 		if len(existingValues) != 0 {
 			oldRBCDNtSecurityDescriptor = []byte(existingValues[0])
 		}
-		binaryNtSecurityDescriptor, err := utils.UpdateNTSecurityDescriptorDACL(&ldapSession, oldRBCDNtSecurityDescriptor, []string{}, allowedToActOnBehalfOfAnotherIdentity, debug)
+		binaryNtSecurityDescriptor, err := utils.UpdateNTSecurityDescriptorDACL(&ldapSession, oldRBCDNtSecurityDescriptor, allowedToActOnBehalfOfAnotherIdentity, []string{}, debug)
 		if err != nil {
 			return fmt.Errorf("error updating NTSecurityDescriptor: %s", err)
 		}
 
 		if debug {
-			logger.Info(fmt.Sprintf("Updated msDS-AllowedToActOnBehalfOfOtherIdentity value: \"%s\"", hex.EncodeToString(binaryNtSecurityDescriptor)))
+			logger.Info(fmt.Sprintf("Updated msDS-AllowedToActOnBehalfOfOtherIdentity value: %s", hex.EncodeToString(binaryNtSecurityDescriptor)))
 		}
 
 		if !bytes.Equal(binaryNtSecurityDescriptor, oldRBCDNtSecurityDescriptor) {
-			if len(binaryNtSecurityDescriptor) == 0 {
-				err = ldapSession.FlushAttributeValues(distinguishedName, "msDS-AllowedToActOnBehalfOfOtherIdentity")
-				if err != nil {
-					return fmt.Errorf("error removing ressource-based constrained delegation of %s: %s", distinguishedName, err)
-				}
-			} else {
-				err = ldapSession.OverwriteAttributeValues(distinguishedName, "msDS-AllowedToActOnBehalfOfOtherIdentity", []string{string(binaryNtSecurityDescriptor)})
-				if err != nil {
-					return fmt.Errorf("error removing ressource-based constrained delegation of %s to %s: %s", distinguishedName, allowedToActOnBehalfOfAnotherIdentity, err)
-				}
+			err = ldapSession.OverwriteAttributeValues(distinguishedName, "msDS-AllowedToActOnBehalfOfOtherIdentity", []string{string(binaryNtSecurityDescriptor)})
+			if err != nil {
+				return fmt.Errorf("error adding resource-based constrained delegation of %s to %s: %s", distinguishedName, allowedToActOnBehalfOfAnotherIdentity, err)
 			}
-			logger.Info(fmt.Sprintf("Ressource-based constrained delegation removed for %s", distinguishedName))
+			logger.Info(fmt.Sprintf("Resource-based constrained delegation added for %s", distinguishedName))
 		} else {
 			logger.Info(fmt.Sprintf("No changes made to msDS-AllowedToActOnBehalfOfOtherIdentity for %s", distinguishedName))
 		}
 
 	} else {
-		return fmt.Errorf("could not find a computer, person or user having a ressource based constrained delegation for distinguished name: %s", distinguishedName)
+		return fmt.Errorf("could not find a computer, person or user having a resource based constrained delegation for distinguished name: %s", distinguishedName)
 	}
 
 	return nil

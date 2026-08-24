@@ -1,4 +1,4 @@
-package mode_audit
+package mode_find
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"github.com/TheManticoreProject/winacl/securitydescriptor"
 )
 
-// AuditRessourceBasedConstrainedDelegations retrieves resource-based constrained delegations for a given domain controller.
+// FindResourceBasedConstrainedDelegations retrieves resource-based constrained delegations for a given domain controller.
 //
 // Parameters:
 //
@@ -24,7 +24,7 @@ import (
 // Returns:
 //
 //	An error if the operation fails, nil otherwise.
-func AuditRessourceBasedConstrainedDelegations(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, debug bool) error {
+func FindResourceBasedConstrainedDelegations(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, debug bool) error {
 	ldapSession := ldap.Session{}
 	ldapSession.InitSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
 	success, err := ldapSession.Connect()
@@ -40,7 +40,7 @@ func AuditRessourceBasedConstrainedDelegations(ldapHost string, ldapPort int, cr
 		// Searching for the object with the given distinguished name
 		query += fmt.Sprintf("(distinguishedName=%s)", utils.EscapeLDAPFilterValue(distinguishedName))
 	}
-	// Searching for non empty msDS-AllowedToActOnBehalfOfOtherIdentity attribute
+	// Querying the msDS-AllowedToActOnBehalfOfOtherIdentity attribute
 	query += "(msDS-AllowedToActOnBehalfOfOtherIdentity=*)"
 	// Closing the first AND
 	query += ")"
@@ -106,7 +106,6 @@ func AuditRessourceBasedConstrainedDelegations(ldapHost string, ldapPort int, cr
 					logger.Print("          " + formattedString)
 				}
 			}
-
 		}
 		logger.Print("")
 	} else {
