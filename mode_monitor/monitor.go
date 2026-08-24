@@ -52,8 +52,8 @@ func MonitorDelegations(domainController string, ldapPort int, creds *credential
 	// Create a map to store the current state of delegations
 	delegationMap := make(map[string]DelegationState)
 
-	// We are looking for either a user, computer or person
-	query := "(|(objectClass=computer)(objectClass=person)(objectClass=user))"
+	// Monitor account objects that expose the delegation flags in userAccountControl.
+	query := "(&(|(objectClass=computer)(objectClass=user))(userAccountControl=*))"
 	searchResults, err := ldapSession.QueryWholeSubtree("", query, []string{"userAccountControl", "msDS-AllowedToDelegateTo", "msDS-AllowedToActOnBehalfOfOtherIdentity"})
 	if err != nil {
 		return fmt.Errorf("error performing LDAP search: %s", err)
