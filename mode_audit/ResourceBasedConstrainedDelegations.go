@@ -25,8 +25,10 @@ import (
 //
 //	An error if the operation fails, nil otherwise.
 func AuditResourceBasedConstrainedDelegations(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, debug bool) error {
-	ldapSession := ldap.Session{}
-	ldapSession.InitSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
+	ldapSession, err := ldap.NewSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
+	if err != nil {
+		return fmt.Errorf("error creating LDAP session: %s", err)
+	}
 	success, err := ldapSession.Connect()
 	if !success {
 		return fmt.Errorf("error connecting to LDAP: %s", err)
@@ -89,7 +91,7 @@ func AuditResourceBasedConstrainedDelegations(ldapHost string, ldapPort int, cre
 				}
 
 				sidString := ace.Identity.SID.ToString()
-				distingushedName, err := utils.LookupSID(&ldapSession, sidString)
+				distingushedName, err := utils.LookupSID(ldapSession, sidString)
 
 				// Format the string depending on if the SID lookup failed or not
 				var formattedString string
