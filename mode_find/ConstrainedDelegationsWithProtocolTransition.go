@@ -3,6 +3,7 @@ package mode_find
 import (
 	"fmt"
 
+	"github.com/TheManticoreProject/Delegations/utils"
 	"github.com/TheManticoreProject/Manticore/logger"
 	"github.com/TheManticoreProject/Manticore/network/ldap"
 	"github.com/TheManticoreProject/Manticore/network/ldap/ldap_attributes"
@@ -36,7 +37,7 @@ func FindConstrainedDelegationsWithProtocolTransition(ldapHost string, ldapPort 
 	query += "(|(objectClass=computer)(objectClass=person)(objectClass=user))"
 	if len(distinguishedName) > 0 {
 		// Searching for the object with the given distinguished name
-		query += fmt.Sprintf("(distinguishedName=%s)", distinguishedName)
+		query += fmt.Sprintf("(distinguishedName=%s)", utils.EscapeLDAPFilterValue(distinguishedName))
 	}
 	// Querying the msDS-AllowedToDelegateTo attribute
 	query += "(msDS-AllowedToDelegateTo=*)"

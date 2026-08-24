@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/TheManticoreProject/Delegations/mode_remove"
+	"github.com/TheManticoreProject/Delegations/utils"
 	"github.com/TheManticoreProject/Manticore/logger"
 	"github.com/TheManticoreProject/Manticore/network/ldap"
 	"github.com/TheManticoreProject/Manticore/windows/credentials"
@@ -45,7 +46,7 @@ func AddConstrainedDelegation(ldapHost string, ldapPort int, creds *credentials.
 	// We are looking for either a user, computer or person
 	query += "(|(objectClass=computer)(objectClass=person)(objectClass=user))"
 	// Searching for the object with the given distinguished name
-	query += fmt.Sprintf("(distinguishedName=%s)", distinguishedName)
+	query += fmt.Sprintf("(distinguishedName=%s)", utils.EscapeLDAPFilterValue(distinguishedName))
 	// Closing the first AND
 	query += ")"
 	// Querying the msDS-AllowedToDelegateTo attribute

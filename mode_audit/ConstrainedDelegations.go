@@ -38,7 +38,7 @@ func AuditConstrainedDelegations(ldapHost string, ldapPort int, creds *credentia
 	query += "(&"
 	if len(distinguishedName) > 0 {
 		// Searching for the object with the given distinguished name
-		query += fmt.Sprintf("(distinguishedName=%s)", distinguishedName)
+		query += fmt.Sprintf("(distinguishedName=%s)", utils.EscapeLDAPFilterValue(distinguishedName))
 	}
 	// Searching for non empty msDS-AllowedToDelegateTo attribute
 	query += "(msDS-AllowedToDelegateTo=*)"
