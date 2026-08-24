@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/TheManticoreProject/Delegations/utils"
 	"github.com/TheManticoreProject/Manticore/logger"
 	"github.com/TheManticoreProject/Manticore/network/ldap"
 	"github.com/TheManticoreProject/Manticore/network/ldap/ldap_attributes"
@@ -40,7 +41,7 @@ func ClearUnconstrainedDelegation(ldapHost string, ldapPort int, creds *credenti
 		return fmt.Errorf("could not find an object with distinguished name: %s", distinguishedName)
 	}
 
-	searchQuery := fmt.Sprintf("(distinguishedName=%s)", distinguishedName)
+	searchQuery := fmt.Sprintf("(distinguishedName=%s)", utils.EscapeLDAPFilterValue(distinguishedName))
 	searchResults, err := ldapSession.QueryWholeSubtree("", searchQuery, []string{"userAccountControl"})
 	if err != nil {
 		return fmt.Errorf("error querying userAccountControl: %s", err)

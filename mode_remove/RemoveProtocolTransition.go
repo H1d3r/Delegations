@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/TheManticoreProject/Delegations/utils"
 	"github.com/TheManticoreProject/Manticore/logger"
 	"github.com/TheManticoreProject/Manticore/network/ldap"
 	"github.com/TheManticoreProject/Manticore/network/ldap/ldap_attributes"
@@ -40,7 +41,7 @@ func RemoveProtocolTransition(ldapHost string, ldapPort int, creds *credentials.
 		return fmt.Errorf("could not find an object with distinguished name: %s", distinguishedName)
 	}
 
-	searchResults, err := ldapSession.QueryWholeSubtree("", fmt.Sprintf("(distinguishedName=%s)", distinguishedName), []string{"userAccountControl"})
+	searchResults, err := ldapSession.QueryWholeSubtree("", fmt.Sprintf("(distinguishedName=%s)", utils.EscapeLDAPFilterValue(distinguishedName)), []string{"userAccountControl"})
 	if err != nil {
 		return fmt.Errorf("error querying userAccountControl: %s", err)
 	}

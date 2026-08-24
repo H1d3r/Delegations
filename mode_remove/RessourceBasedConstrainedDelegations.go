@@ -42,7 +42,7 @@ func RemoveRessourceBasedConstrainedDelegation(ldapHost string, ldapPort int, cr
 		return fmt.Errorf("could not find an object with distinguished name: %s", distinguishedName)
 	}
 
-	searchResults, err := ldapSession.QueryWholeSubtree("", fmt.Sprintf("(distinguishedName=%s)", distinguishedName), []string{"msDS-AllowedToActOnBehalfOfOtherIdentity"})
+	searchResults, err := ldapSession.QueryWholeSubtree("", fmt.Sprintf("(distinguishedName=%s)", utils.EscapeLDAPFilterValue(distinguishedName)), []string{"msDS-AllowedToActOnBehalfOfOtherIdentity"})
 	if err != nil {
 		return fmt.Errorf("error querying msDS-AllowedToActOnBehalfOfOtherIdentity: %s", err)
 	}

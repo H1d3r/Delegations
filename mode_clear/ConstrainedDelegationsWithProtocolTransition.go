@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/TheManticoreProject/Delegations/mode_remove"
+	"github.com/TheManticoreProject/Delegations/utils"
 	"github.com/TheManticoreProject/Manticore/logger"
 	"github.com/TheManticoreProject/Manticore/network/ldap"
 	"github.com/TheManticoreProject/Manticore/network/ldap/ldap_attributes"
@@ -46,7 +47,7 @@ func ClearConstrainedDelegationWithProtocolTransition(ldapHost string, ldapPort 
 	query += "(|(objectClass=computer)(objectClass=person)(objectClass=user))"
 	query += "(&"
 	// Searching for the object with the given distinguished name
-	query += fmt.Sprintf("(distinguishedName=%s)", distinguishedName)
+	query += fmt.Sprintf("(distinguishedName=%s)", utils.EscapeLDAPFilterValue(distinguishedName))
 	// With the userAccountControl attribute with the flag UAF_TRUSTED_TO_AUTH_FOR_DELEGATION set (protocol transition enabled)
 	query += fmt.Sprintf("(userAccountControl:1.2.840.113556.1.4.803:=%d)", ldap_attributes.UAF_TRUSTED_TO_AUTH_FOR_DELEGATION)
 	query += ")"

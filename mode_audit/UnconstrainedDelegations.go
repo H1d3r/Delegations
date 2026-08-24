@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/TheManticoreProject/Delegations/utils"
 	"github.com/TheManticoreProject/Manticore/logger"
 	"github.com/TheManticoreProject/Manticore/network/ldap"
 	"github.com/TheManticoreProject/Manticore/network/ldap/ldap_attributes"
@@ -37,7 +38,7 @@ func AuditUnconstrainedDelegations(ldapHost string, ldapPort int, creds *credent
 	query += "(|(objectClass=computer)(objectClass=person)(objectClass=user))"
 	if len(distinguishedName) > 0 {
 		// Searching for the object with the given distinguished name
-		query += fmt.Sprintf("(distinguishedName=%s)", distinguishedName)
+		query += fmt.Sprintf("(distinguishedName=%s)", utils.EscapeLDAPFilterValue(distinguishedName))
 	}
 	// With the userAccountControl attribute set to the flag UAF_TRUSTED_FOR_DELEGATION (unconstrained delegation)
 	query += fmt.Sprintf("(userAccountControl:1.2.840.113556.1.4.803:=%d)", ldap_attributes.UAF_TRUSTED_FOR_DELEGATION)
@@ -94,7 +95,7 @@ func AuditUnconstrainedDelegations(ldapHost string, ldapPort int, creds *credent
 	query += fmt.Sprintf("(!(userAccountControl:1.2.840.113556.1.4.803:=%d))", ldap_attributes.UAF_PARTIAL_SECRETS_ACCOUNT)
 	// Searching for the object with the given distinguished name
 	if len(distinguishedName) > 0 {
-		query += fmt.Sprintf("(distinguishedName=%s)", distinguishedName)
+		query += fmt.Sprintf("(distinguishedName=%s)", utils.EscapeLDAPFilterValue(distinguishedName))
 	}
 	query += ")"
 	searchResults, err = ldapSession.QueryWholeSubtree("", query, []string{"userAccountControl"})

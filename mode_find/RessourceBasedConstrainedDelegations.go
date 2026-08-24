@@ -37,7 +37,7 @@ func FindRessourceBasedConstrainedDelegations(ldapHost string, ldapPort int, cre
 	query += "(|(objectClass=computer)(objectClass=person)(objectClass=user))"
 	if len(distinguishedName) > 0 {
 		// Searching for the object with the given distinguished name
-		query += fmt.Sprintf("(distinguishedName=%s)", distinguishedName)
+		query += fmt.Sprintf("(distinguishedName=%s)", utils.EscapeLDAPFilterValue(distinguishedName))
 	}
 	// Querying the msDS-AllowedToActOnBehalfOfOtherIdentity attribute
 	query += "(msDS-AllowedToActOnBehalfOfOtherIdentity=*)"

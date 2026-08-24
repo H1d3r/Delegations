@@ -18,12 +18,18 @@ import (
 	"github.com/TheManticoreProject/winacl/securitydescriptor"
 	"github.com/TheManticoreProject/winacl/securitydescriptor/control"
 	"github.com/TheManticoreProject/winacl/sid"
+	goldap "github.com/go-ldap/ldap/v3"
 )
+
+// EscapeLDAPFilterValue escapes a value before it is inserted into an LDAP filter assertion.
+func EscapeLDAPFilterValue(value string) string {
+	return goldap.EscapeFilter(value)
+}
 
 // DNExists checks if a distinguished name exists in LDAP
 // Returns true if the distinguished name exists, false otherwise
 func DNExists(ldapSession *ldap.Session, distinguishedName string) bool {
-	searchResults, err := ldapSession.QueryWholeSubtree("", "(distinguishedName="+distinguishedName+")", []string{})
+	searchResults, err := ldapSession.QueryWholeSubtree("", "(distinguishedName="+EscapeLDAPFilterValue(distinguishedName)+")", []string{})
 	if err != nil {
 		return false
 	}
@@ -41,7 +47,7 @@ func FindTarget(ldapSession *ldap.Session, distinguishedName string, sAMAccountN
 
 	} else if len(sAMAccountName) != 0 {
 		// If a sAMAccountName is provided, query LDAP for the target
-		searchResults, err := ldapSession.QueryWholeSubtree("", "(sAMAccountName="+sAMAccountName+")", []string{})
+		searchResults, err := ldapSession.QueryWholeSubtree("", "(sAMAccountName="+EscapeLDAPFilterValue(sAMAccountName)+")", []string{})
 		if err != nil {
 			return "", fmt.Errorf("error querying LDAP: %s", err)
 		}
@@ -63,7 +69,7 @@ func FindTarget(ldapSession *ldap.Session, distinguishedName string, sAMAccountN
 // Returns the distinguished name and nil if found, empty string and error otherwise
 func LookupSID(ldapSession *ldap.Session, sid string) (string, error) {
 	// Construct LDAP query to find object with the given SID
-	searchQuery := fmt.Sprintf("(objectSid=%s)", sid)
+	searchQuery := fmt.Sprintf("(objectSid=%s)", EscapeLDAPFilterValue(sid))
 	searchResults, err := ldapSession.QueryWholeSubtree("", searchQuery, []string{"distinguishedName"})
 	if err != nil {
 		return "?", fmt.Errorf("error querying LDAP for SID %s: %s", sid, err)
@@ -111,7 +117,7 @@ func SIDFromValue(ldapSession *ldap.Session, value string) (*sid.SID, error) {
 		}
 
 		// Construct LDAP query to find object with the given value
-		searchQuery := fmt.Sprintf("(%s=%s)", valueType, value)
+		searchQuery := fmt.Sprintf("(%s=%s)", valueType, EscapeLDAPFilterValue(value))
 		searchResults, err := ldapSession.QueryWholeSubtree("", searchQuery, []string{"objectSid"})
 		if err != nil {
 			return nil, fmt.Errorf("error querying LDAP for %s %s: %s", valueType, value, err)
@@ -276,7 +282,7 @@ func CreateRbcdAce(sid *sid.SID, index int) ace.AccessControlEntry {
 //	error: An error if the operation fails, nil otherwise
 func SPNExists(ldapSession *ldap.Session, servicePrincipalName string) (bool, error) {
 	// Query LDAP for computer account matching hostname
-	searchQuery := fmt.Sprintf("(servicePrincipalName=%s)", servicePrincipalName)
+	searchQuery := fmt.Sprintf("(servicePrincipalName=%s)", EscapeLDAPFilterValue(servicePrincipalName))
 	searchResults, err := ldapSession.QueryWholeSubtree("", searchQuery, []string{})
 	if err != nil {
 		return false, fmt.Errorf("error querying LDAP for SPN %s: %s", servicePrincipalName, err)
