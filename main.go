@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/TheManticoreProject/Delegations/mode_add"
 	"github.com/TheManticoreProject/Delegations/mode_audit"
@@ -596,8 +597,9 @@ func main() {
 	creds, err := credentials.NewCredentials(authDomain, authUsername, authPassword, authHashes)
 	if err != nil {
 		logger.Warn(fmt.Sprintf("Error creating credentials: %s", err))
-		return
+		os.Exit(1)
 	}
+	operationFailed := false
 
 	if mode == "add" {
 		if delegationType == "constrained" {
@@ -611,6 +613,7 @@ func main() {
 					err = mode_remove.RemoveProtocolTransition(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
 					if err != nil {
 						logger.Warn(fmt.Sprintf("Error removing protocol transition: %s", err))
+						operationFailed = true
 					}
 				}
 				err = mode_add.AddConstrainedDelegation(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, allowedToDelegateTo, debug)
@@ -639,18 +642,22 @@ func main() {
 		err = mode_audit.AuditUnconstrainedDelegations(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug, ignoreLegitimate)
 		if err != nil {
 			logger.Warn(fmt.Sprintf("Error auditing unconstrained delegations: %s", err))
+			operationFailed = true
 		}
 		err = mode_audit.AuditConstrainedDelegations(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
 		if err != nil {
 			logger.Warn(fmt.Sprintf("Error auditing constrained delegations: %s", err))
+			operationFailed = true
 		}
 		err = mode_audit.AuditConstrainedDelegationsWithProtocolTransition(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
 		if err != nil {
 			logger.Warn(fmt.Sprintf("Error auditing constrained delegations with protocol transition: %s", err))
+			operationFailed = true
 		}
 		err = mode_audit.AuditRessourceBasedConstrainedDelegations(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
 		if err != nil {
 			logger.Warn(fmt.Sprintf("Error auditing ressource-based constrained delegations: %s", err))
+			operationFailed = true
 		}
 
 	} else if mode == "clear" {
@@ -715,6 +722,7 @@ func main() {
 					err = mode_remove.RemoveProtocolTransition(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
 					if err != nil {
 						logger.Warn(fmt.Sprintf("Error removing protocol transition: %s", err))
+						operationFailed = true
 					}
 				}
 				err = mode_remove.RemoveConstrainedDelegation(domainController, ldapPort, creds, useLdaps, useKerberos, distinguishedName, allowedToDelegateTo, debug)
@@ -747,7 +755,11 @@ func main() {
 
 	} else {
 		logger.Warn(fmt.Sprintf("Invalid mode '%s'.", mode))
+		operationFailed = true
 	}
 
+	if operationFailed || err != nil {
+		os.Exit(1)
+	}
 	logger.Print("Done.")
 }
