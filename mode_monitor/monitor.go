@@ -24,6 +24,15 @@ type DelegationState struct {
 
 const monitorPollingInterval = 5 * time.Second
 
+func (state DelegationState) hasDelegation() bool {
+	delegationFlags := int(ldap_attributes.UAF_TRUSTED_FOR_DELEGATION) |
+		int(ldap_attributes.UAF_TRUSTED_TO_AUTH_FOR_DELEGATION)
+
+	return state.userAccountControl&delegationFlags != 0 ||
+		len(state.msDSAllowedToDelegateTo) > 0 ||
+		len(state.msDSAllowedToActOnBehalfOfOtherIdentity) > 0
+}
+
 // MonitorDelegations monitors the delegation settings of a user or computer account.
 //
 //	Parameters:
@@ -153,14 +162,14 @@ func MonitorDelegations(domainController string, ldapPort int, creds *credential
 		for dn := range newDelegationMap {
 			if _, exists := delegationMap[dn]; exists {
 				commonDNs = append(commonDNs, dn)
-			} else {
+			} else if newDelegationMap[dn].hasDelegation() {
 				logger.Info(fmt.Sprintf("[\x1b[1;92m+\x1b[0m] \x1b[1;92mObject created: %s\x1b[0m", dn))
 			}
 		}
 
 		// Check for deleted objects
 		for dn := range delegationMap {
-			if _, exists := newDelegationMap[dn]; !exists {
+			if _, exists := newDelegationMap[dn]; !exists && delegationMap[dn].hasDelegation() {
 				logger.Info(fmt.Sprintf("[\x1b[1;91m-\x1b[0m] \x1b[1;91mObject deleted: %s\x1b[0m", dn))
 			}
 		}
