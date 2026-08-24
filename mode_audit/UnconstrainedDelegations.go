@@ -9,7 +9,27 @@ import (
 	"github.com/TheManticoreProject/Manticore/network/ldap"
 	"github.com/TheManticoreProject/Manticore/network/ldap/ldap_attributes"
 	"github.com/TheManticoreProject/Manticore/windows/credentials"
+	goldap "github.com/go-ldap/ldap/v3"
 )
+
+func isLegitimateUnconstrainedDelegation(userAccountControl int) bool {
+	return userAccountControl&int(ldap_attributes.UAF_SERVER_TRUST_ACCOUNT) != 0
+}
+
+func suspiciousUnconstrainedDelegationResults(searchResults []*goldap.Entry) []*goldap.Entry {
+	filteredResults := searchResults[:0]
+	for _, entry := range searchResults {
+		userAccountControl, err := strconv.Atoi(entry.GetAttributeValue("userAccountControl"))
+		if err != nil {
+			logger.Warn(fmt.Sprintf("Error getting userAccountControl: %s", err))
+			continue
+		}
+		if !isLegitimateUnconstrainedDelegation(userAccountControl) {
+			filteredResults = append(filteredResults, entry)
+		}
+	}
+	return filteredResults
+}
 
 // AuditUnconstrainedDelegations retrieves unconstrained delegations for a given domain controller.
 //
@@ -49,6 +69,9 @@ func AuditUnconstrainedDelegations(ldapHost string, ldapPort int, creds *credent
 	if err != nil {
 		return fmt.Errorf("error performing LDAP search: %s", err)
 	}
+	if ignoreLegitimate {
+		searchResults = suspiciousUnconstrainedDelegationResults(searchResults)
+	}
 
 	if len(searchResults) != 0 {
 		logger.Print(fmt.Sprintf("[>] Unconstrained Delegations (\x1b[93m%d\x1b[0m):", len(searchResults)))
@@ -60,25 +83,18 @@ func AuditUnconstrainedDelegations(ldapHost string, ldapPort int, creds *credent
 			}
 
 			auditString := ""
-			if userAccountControl&int(ldap_attributes.UAF_SERVER_TRUST_ACCOUNT) == int(ldap_attributes.UAF_SERVER_TRUST_ACCOUNT) {
-				if ignoreLegitimate {
-					auditString = ""
-				} else {
-					auditString = "(\x1b[92mLegitimate\x1b[0m: DC)"
-				}
+			if isLegitimateUnconstrainedDelegation(userAccountControl) {
+				auditString = "(\x1b[92mLegitimate\x1b[0m: DC)"
 			} else if userAccountControl&int(ldap_attributes.UAF_PARTIAL_SECRETS_ACCOUNT) == int(ldap_attributes.UAF_PARTIAL_SECRETS_ACCOUNT) {
 				auditString = "(\x1b[91mSuspicious\x1b[0m: RODCs do not have unconstrained delegation by default)"
 			} else {
 				auditString = "(\x1b[91mSuspicious\x1b[0m)"
 			}
 
-			// Print the audit string
-			if len(auditString) > 0 {
-				if k < len(searchResults)-1 {
-					logger.Print(fmt.Sprintf("  ├── \x1b[94m%s\x1b[0m %s", entry.DN, auditString))
-				} else {
-					logger.Print(fmt.Sprintf("  └── \x1b[94m%s\x1b[0m %s", entry.DN, auditString))
-				}
+			if k < len(searchResults)-1 {
+				logger.Print(fmt.Sprintf("  ├── \x1b[94m%s\x1b[0m %s", entry.DN, auditString))
+			} else {
+				logger.Print(fmt.Sprintf("  └── \x1b[94m%s\x1b[0m %s", entry.DN, auditString))
 			}
 		}
 		logger.Print("")

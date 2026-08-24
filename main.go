@@ -167,7 +167,7 @@ func parseArgs() {
 	} else {
 		subparser_audit_group_config.NewBoolArgument(&debug, "", "--debug", false, "Debug mode.")
 		subparser_audit_group_config.NewStringArgument(&distinguishedName, "-D", "--distinguished-name", "", false, "Distinguished name of the computer, user or group to audit for delegations.")
-		subparser_audit_group_config.NewBoolArgument(&ignoreLegitimate, "-I", "--ignore-legitimate", false, "Ignore legitimate delegations, keep only suspicious ones.")
+		subparser_audit_group_config.NewBoolArgument(&ignoreLegitimate, "-I", "--ignore-legitimate", false, "Ignore legitimate unconstrained delegations, keep only suspicious ones.")
 	}
 	// LDAP Connection Settings
 	subparser_audit_group_ldapSettings, err := subparser_audit.NewArgumentGroup("LDAP Connection Settings")
