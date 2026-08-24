@@ -31,6 +31,7 @@ func RemoveConstrainedDelegationWithProtocolTransition(ldapHost string, ldapPort
 	if !success {
 		return fmt.Errorf("error connecting to LDAP: %s", err)
 	}
+	defer ldapSession.Close()
 
 	// Check if the object exists
 	exists, err := ldapSession.DistinguishedNameExists(distinguishedName)
@@ -97,8 +98,6 @@ func RemoveConstrainedDelegationWithProtocolTransition(ldapHost string, ldapPort
 	} else {
 		return fmt.Errorf("could not find a computer, person or user having a constrained delegation with protocol transition for distinguished name: %s", distinguishedName)
 	}
-
-	ldapSession.Close()
 
 	return nil
 }

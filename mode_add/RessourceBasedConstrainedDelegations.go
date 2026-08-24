@@ -32,6 +32,7 @@ func AddRessourceBasedConstrainedDelegation(ldapHost string, ldapPort int, creds
 	if !success {
 		return fmt.Errorf("error connecting to LDAP: %s", err)
 	}
+	defer ldapSession.Close()
 
 	// Check if the object exists
 	exists, err := ldapSession.DistinguishedNameExists(distinguishedName)
@@ -81,8 +82,6 @@ func AddRessourceBasedConstrainedDelegation(ldapHost string, ldapPort int, creds
 	} else {
 		return fmt.Errorf("could not find a computer, person or user having a ressource based constrained delegation for distinguished name: %s", distinguishedName)
 	}
-
-	ldapSession.Close()
 
 	return nil
 }

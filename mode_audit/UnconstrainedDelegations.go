@@ -32,6 +32,7 @@ func AuditUnconstrainedDelegations(ldapHost string, ldapPort int, creds *credent
 	if !success {
 		return fmt.Errorf("error performing LDAP search: %s", err)
 	}
+	defer ldapSession.Close()
 
 	query := "(&"
 	// We are looking for either a user, computer or person
@@ -116,8 +117,6 @@ func AuditUnconstrainedDelegations(ldapHost string, ldapPort int, creds *credent
 		}
 		logger.Print("")
 	}
-
-	ldapSession.Close()
 
 	return nil
 }

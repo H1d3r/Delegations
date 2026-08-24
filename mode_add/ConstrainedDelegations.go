@@ -32,6 +32,7 @@ func AddConstrainedDelegation(ldapHost string, ldapPort int, creds *credentials.
 	if !success {
 		return fmt.Errorf("error connecting to LDAP: %s", err)
 	}
+	defer ldapSession.Close()
 
 	// Check if the object exists
 	exists, err := ldapSession.DistinguishedNameExists(distinguishedName)
@@ -82,8 +83,6 @@ func AddConstrainedDelegation(ldapHost string, ldapPort int, creds *credentials.
 	} else {
 		return fmt.Errorf("could not find a computer, person or user having a constrained delegation without protocol transition for distinguished name: %s", distinguishedName)
 	}
-
-	ldapSession.Close()
 
 	return nil
 }

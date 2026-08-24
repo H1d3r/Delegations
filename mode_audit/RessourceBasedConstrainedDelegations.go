@@ -31,6 +31,7 @@ func AuditRessourceBasedConstrainedDelegations(ldapHost string, ldapPort int, cr
 	if !success {
 		return fmt.Errorf("error connecting to LDAP: %s", err)
 	}
+	defer ldapSession.Close()
 
 	query := "(&"
 	// We are looking for either a user, computer or person
@@ -111,8 +112,6 @@ func AuditRessourceBasedConstrainedDelegations(ldapHost string, ldapPort int, cr
 	} else {
 		logger.Print("[>] Resource-Based Constrained Delegations (0)")
 	}
-
-	ldapSession.Close()
 
 	return nil
 }

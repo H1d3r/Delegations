@@ -31,6 +31,7 @@ func ClearUnconstrainedDelegation(ldapHost string, ldapPort int, creds *credenti
 	if !success {
 		return fmt.Errorf("error connecting to LDAP: %s", err)
 	}
+	defer ldapSession.Close()
 
 	// Check if the object exists
 	exists, err := ldapSession.DistinguishedNameExists(distinguishedName)
@@ -58,7 +59,6 @@ func ClearUnconstrainedDelegation(ldapHost string, ldapPort int, creds *credenti
 
 		// Check if the TRUSTED_FOR_DELEGATION flag is set
 		if (uacValue & int(ldap_attributes.UAF_TRUSTED_FOR_DELEGATION)) == 0 {
-			ldapSession.Close()
 			logger.Info(fmt.Sprintf("No Unconstrained Delegation was setup on this object: %s", distinguishedName))
 			return nil
 		}
@@ -76,8 +76,6 @@ func ClearUnconstrainedDelegation(ldapHost string, ldapPort int, creds *credenti
 	} else {
 		return fmt.Errorf("could not find a computer, person or user having an unconstrained delegation for distinguished name: %s", distinguishedName)
 	}
-
-	ldapSession.Close()
 
 	return nil
 }
