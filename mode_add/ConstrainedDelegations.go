@@ -57,7 +57,9 @@ func AddConstrainedDelegation(ldapHost string, ldapPort int, creds *credentials.
 	// Add constrained delegation
 	if len(searchResults) > 0 {
 		// Remove protocol transition (TRUSTED_TO_AUTH_FOR_DELEGATION flag)
-		mode_remove.RemoveProtocolTransition(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
+		if err := mode_remove.RemoveProtocolTransition(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug); err != nil {
+			return fmt.Errorf("error removing protocol transition: %w", err)
+		}
 
 		// Add constrained delegation
 		values := searchResults[0].GetEqualFoldAttributeValues("msDS-AllowedToDelegateTo")

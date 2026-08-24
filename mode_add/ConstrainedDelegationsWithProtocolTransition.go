@@ -56,7 +56,9 @@ func AddConstrainedDelegationWithProtocolTransition(ldapHost string, ldapPort in
 	// Add constrained delegation with protocol transition
 	if len(searchResults) > 0 {
 		// Activate protocol transition (TRUSTED_TO_AUTH_FOR_DELEGATION flag)
-		AddProtocolTransition(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
+		if err := AddProtocolTransition(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug); err != nil {
+			return fmt.Errorf("error adding protocol transition: %w", err)
+		}
 
 		values := searchResults[0].GetEqualFoldAttributeValues("msDS-AllowedToDelegateTo")
 		for _, value := range allowedToDelegateTo {

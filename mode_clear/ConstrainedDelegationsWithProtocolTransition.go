@@ -71,7 +71,9 @@ func ClearConstrainedDelegationWithProtocolTransition(ldapHost string, ldapPort 
 				return fmt.Errorf("error clearing msDS-AllowedToDelegateTo: %s", err)
 			}
 
-			mode_remove.RemoveProtocolTransition(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug)
+			if err := mode_remove.RemoveProtocolTransition(ldapHost, ldapPort, creds, useLdaps, useKerberos, distinguishedName, debug); err != nil {
+				return fmt.Errorf("error removing protocol transition: %w", err)
+			}
 		}
 
 		logger.Info(fmt.Sprintf("Constrained delegation with protocol transition cleared for %s", distinguishedName))
