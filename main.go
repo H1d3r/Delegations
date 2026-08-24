@@ -63,10 +63,16 @@ func parseArgs() {
 		logger.Warn(fmt.Sprintf("Error creating ArgumentGroup: %s", err))
 	} else {
 		subparser_add_constrained_group_config.NewBoolArgument(&debug, "", "--debug", false, "Debug mode.")
-		subparser_add_constrained_group_config.NewBoolArgument(&withProtocolTransition, "-w", "--with-protocol-transition", false, "Enable protocol transition on this object on this object.")
-		subparser_add_constrained_group_config.NewBoolArgument(&removeProtocolTransition, "-r", "--remove-protocol-transition", false, "Disable protocol transition on this object.")
 		subparser_add_constrained_group_config.NewStringArgument(&distinguishedName, "-D", "--distinguished-name", "", true, "Distinguished name of the user or group to add the delegation to.")
 		subparser_add_constrained_group_config.NewListOfStringsArgument(&allowedToDelegateTo, "-a", "--allowed-to-delegate-to", []string{}, true, "User or group to delegate to.")
+	}
+	// Protocol transition flags
+	subparser_add_constrained_group_protocolTransition, err := subparser_add_constrained.NewNotRequiredMutuallyExclusiveArgumentGroup("Protocol Transition")
+	if err != nil {
+		logger.Warn(fmt.Sprintf("Error creating ArgumentGroup: %s", err))
+	} else {
+		subparser_add_constrained_group_protocolTransition.NewBoolArgument(&withProtocolTransition, "-w", "--with-protocol-transition", false, "Enable protocol transition on this object.")
+		subparser_add_constrained_group_protocolTransition.NewBoolArgument(&removeProtocolTransition, "-r", "--remove-protocol-transition", false, "Disable protocol transition on this object.")
 	}
 	// LDAP Connection Settings
 	subparser_add_constrained_group_ldapSettings, err := subparser_add_constrained.NewArgumentGroup("LDAP Connection Settings")
@@ -454,10 +460,16 @@ func parseArgs() {
 		logger.Warn(fmt.Sprintf("Error creating ArgumentGroup: %s", err))
 	} else {
 		subparser_remove_constrained_group_config.NewBoolArgument(&debug, "", "--debug", false, "Debug mode.")
-		subparser_remove_constrained_group_config.NewBoolArgument(&withProtocolTransition, "-w", "--with-protocol-transition", false, "Enable protocol transition on this object on this object.")
-		subparser_remove_constrained_group_config.NewBoolArgument(&removeProtocolTransition, "-r", "--remove-protocol-transition", false, "Disable protocol transition on this object.")
 		subparser_remove_constrained_group_config.NewStringArgument(&distinguishedName, "-D", "--distinguished-name", "", true, "Distinguished name of the user or group to remove for delegations on.")
 		subparser_remove_constrained_group_config.NewListOfStringsArgument(&allowedToDelegateTo, "-a", "--allowed-to-delegate-to", []string{}, true, "User or group to delegate to.")
+	}
+	// Protocol transition flags
+	subparser_remove_constrained_group_protocolTransition, err := subparser_remove_constrained.NewNotRequiredMutuallyExclusiveArgumentGroup("Protocol Transition")
+	if err != nil {
+		logger.Warn(fmt.Sprintf("Error creating ArgumentGroup: %s", err))
+	} else {
+		subparser_remove_constrained_group_protocolTransition.NewBoolArgument(&withProtocolTransition, "-w", "--with-protocol-transition", false, "Enable protocol transition on this object.")
+		subparser_remove_constrained_group_protocolTransition.NewBoolArgument(&removeProtocolTransition, "-r", "--remove-protocol-transition", false, "Disable protocol transition on this object.")
 	}
 	// LDAP Connection Settings
 	subparser_remove_constrained_group_ldapSettings, err := subparser_remove_constrained.NewArgumentGroup("LDAP Connection Settings")
