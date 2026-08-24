@@ -30,6 +30,7 @@ func FindUnconstrainedDelegations(ldapHost string, ldapPort int, creds *credenti
 	if !success {
 		return fmt.Errorf("error connecting to LDAP: %s", err)
 	}
+	defer ldapSession.Close()
 
 	query := "(&"
 	// We are looking for either a user, computer or person
@@ -61,8 +62,6 @@ func FindUnconstrainedDelegations(ldapHost string, ldapPort int, creds *credenti
 	} else {
 		logger.Print("[>] Unconstrained Delegations (0)")
 	}
-
-	ldapSession.Close()
 
 	return nil
 }

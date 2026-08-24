@@ -56,12 +56,14 @@ func MonitorDelegations(domainController string, ldapPort int, creds *credential
 	query := "(|(objectClass=computer)(objectClass=person)(objectClass=user))"
 	searchResults, err := ldapSession.QueryWholeSubtree("", query, []string{"userAccountControl", "msDS-AllowedToDelegateTo", "msDS-AllowedToActOnBehalfOfOtherIdentity"})
 	if err != nil {
+		ldapSession.Close()
 		return fmt.Errorf("error performing LDAP search: %s", err)
 	}
 	for _, result := range searchResults {
 		dn := result.DN
 		userAccountControl, err := strconv.Atoi(result.GetAttributeValue("userAccountControl"))
 		if err != nil {
+			ldapSession.Close()
 			return fmt.Errorf("error converting userAccountControl to int: %s", err)
 		}
 
@@ -72,6 +74,7 @@ func MonitorDelegations(domainController string, ldapPort int, creds *credential
 			ntSecurityDescriptor := securitydescriptor.NtSecurityDescriptor{}
 			_, err = ntSecurityDescriptor.Unmarshal([]byte(allowedToActOnBehalfOfOtherIdentity[0]))
 			if err != nil {
+				ldapSession.Close()
 				return fmt.Errorf("error creating security descriptor: %s", err)
 			}
 			for _, entry := range ntSecurityDescriptor.DACL.Entries {
@@ -110,12 +113,14 @@ func MonitorDelegations(domainController string, ldapPort int, creds *credential
 		newDelegationMap := make(map[string]DelegationState)
 		searchResults, err := ldapSession.QueryWholeSubtree("", query, []string{"userAccountControl", "msDS-AllowedToDelegateTo", "msDS-AllowedToActOnBehalfOfOtherIdentity"})
 		if err != nil {
+			ldapSession.Close()
 			return fmt.Errorf("error performing LDAP search: %s", err)
 		}
 		for _, result := range searchResults {
 			dn := result.DN
 			userAccountControl, err := strconv.Atoi(result.GetAttributeValue("userAccountControl"))
 			if err != nil {
+				ldapSession.Close()
 				return fmt.Errorf("error converting userAccountControl to int: %s", err)
 			}
 
@@ -126,6 +131,7 @@ func MonitorDelegations(domainController string, ldapPort int, creds *credential
 				ntSecurityDescriptor := securitydescriptor.NtSecurityDescriptor{}
 				_, err = ntSecurityDescriptor.Unmarshal([]byte(allowedToActOnBehalfOfOtherIdentity[0]))
 				if err != nil {
+					ldapSession.Close()
 					return fmt.Errorf("error creating security descriptor: %s", err)
 				}
 				for _, entry := range ntSecurityDescriptor.DACL.Entries {

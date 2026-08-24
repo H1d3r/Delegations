@@ -30,6 +30,7 @@ func FindConstrainedDelegationsWithProtocolTransition(ldapHost string, ldapPort 
 	if !success {
 		return fmt.Errorf("error connecting to LDAP: %s", err)
 	}
+	defer ldapSession.Close()
 
 	query := "(&"
 	// We are looking for either a user, computer or person
@@ -85,8 +86,6 @@ func FindConstrainedDelegationsWithProtocolTransition(ldapHost string, ldapPort 
 	} else {
 		logger.Print("[>] Constrained Delegations with Protocol Transition (0)")
 	}
-
-	ldapSession.Close()
 
 	return nil
 }
