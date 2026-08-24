@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 	"strconv"
+	"time"
 
 	"github.com/TheManticoreProject/Delegations/utils"
 	"github.com/TheManticoreProject/Manticore/logger"
@@ -20,6 +21,8 @@ type DelegationState struct {
 	msDSAllowedToActOnBehalfOfOtherIdentity     []string
 	msDSAllowedToActOnBehalfOfOtherIdentitySIDs []string
 }
+
+const monitorPollingInterval = 5 * time.Second
 
 // MonitorDelegations monitors the delegation settings of a user or computer account.
 //
@@ -89,8 +92,13 @@ func MonitorDelegations(domainController string, ldapPort int, creds *credential
 
 	logger.Info(fmt.Sprintf("[+] Monitoring delegations for %s", creds.Domain))
 
+	pollingTicker := time.NewTicker(monitorPollingInterval)
+	defer pollingTicker.Stop()
+
 	// Continuously monitor for changes
 	for {
+		<-pollingTicker.C
+
 		ldapSession := ldap.Session{}
 		ldapSession.InitSession(domainController, ldapPort, creds, useLdaps, useKerberos)
 		success, err := ldapSession.Connect()
