@@ -26,8 +26,10 @@ import (
 //	Returns:
 //		error: An error if the operation fails, nil otherwise.
 func RemoveRessourceBasedConstrainedDelegation(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, allowedToActOnBehalfOfAnotherIdentity []string, debug bool) error {
-	ldapSession := ldap.Session{}
-	ldapSession.InitSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
+	ldapSession, err := ldap.NewSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
+	if err != nil {
+		return fmt.Errorf("error creating LDAP session: %s", err)
+	}
 	success, err := ldapSession.Connect()
 	if !success {
 		return fmt.Errorf("error connecting to LDAP: %s", err)
@@ -59,7 +61,7 @@ func RemoveRessourceBasedConstrainedDelegation(ldapHost string, ldapPort int, cr
 		if len(existingValues) != 0 {
 			oldRBCDNtSecurityDescriptor = []byte(existingValues[0])
 		}
-		binaryNtSecurityDescriptor, err := utils.UpdateNTSecurityDescriptorDACL(&ldapSession, oldRBCDNtSecurityDescriptor, []string{}, allowedToActOnBehalfOfAnotherIdentity, debug)
+		binaryNtSecurityDescriptor, err := utils.UpdateNTSecurityDescriptorDACL(ldapSession, oldRBCDNtSecurityDescriptor, []string{}, allowedToActOnBehalfOfAnotherIdentity, debug)
 		if err != nil {
 			return fmt.Errorf("error updating NTSecurityDescriptor: %s", err)
 		}

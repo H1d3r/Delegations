@@ -25,8 +25,10 @@ import (
 //
 //	An error if the operation fails, nil otherwise.
 func AuditConstrainedDelegationsWithProtocolTransition(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, debug bool) error {
-	ldapSession := ldap.Session{}
-	ldapSession.InitSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
+	ldapSession, err := ldap.NewSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
+	if err != nil {
+		return fmt.Errorf("error creating LDAP session: %s", err)
+	}
 	success, err := ldapSession.Connect()
 	if !success {
 		return fmt.Errorf("error connecting to LDAP: %s", err)
@@ -78,7 +80,7 @@ func AuditConstrainedDelegationsWithProtocolTransition(ldapHost string, ldapPort
 				}
 
 				// Format the string depending on if the SID lookup failed or not
-				spnExists, _ := utils.SPNExists(&ldapSession, value)
+				spnExists, _ := utils.SPNExists(ldapSession, value)
 				var formattedString string
 				if spnExists {
 					formattedString = fmt.Sprintf("%s \x1b[92m%s\x1b[0m", separator, value)
