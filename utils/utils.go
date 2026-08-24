@@ -236,7 +236,7 @@ func UpdateNTSecurityDescriptorDACL(ldapSession *ldap.Session, rawNTSecurityDesc
 	return binaryNTSecurityDescriptor, nil
 }
 
-// CreateRbcdAce creates an ACE for Ressource-Based Constrained Delegation
+// CreateRbcdAce creates an ACE for Resource-Based Constrained Delegation
 // Returns the ACE and nil if successful, nil and error otherwise
 func CreateRbcdAce(sid *sid.SID, index int) ace.AccessControlEntry {
 	a := ace.AccessControlEntry{}

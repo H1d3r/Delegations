@@ -240,7 +240,7 @@ Usage: Delegations add <constrained|rbcd|unconstrained>
 
    constrained    Add a constrained delegation to a user or group.
    unconstrained  Add a unconstrained delegation to a user or group.
-   rbcd           Add a ressource-based delegation to a user or group.
+   rbcd           Add a resource-based delegation to a user or group.
 
 ```
 

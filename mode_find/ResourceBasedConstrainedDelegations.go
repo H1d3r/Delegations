@@ -10,7 +10,7 @@ import (
 	"github.com/TheManticoreProject/winacl/securitydescriptor"
 )
 
-// FindRessourceBasedConstrainedDelegations retrieves resource-based constrained delegations for a given domain controller.
+// FindResourceBasedConstrainedDelegations retrieves resource-based constrained delegations for a given domain controller.
 //
 // Parameters:
 //
@@ -24,7 +24,7 @@ import (
 // Returns:
 //
 //	An error if the operation fails, nil otherwise.
-func FindRessourceBasedConstrainedDelegations(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, debug bool) error {
+func FindResourceBasedConstrainedDelegations(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, debug bool) error {
 	ldapSession, err := ldap.NewSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
 	if err != nil {
 		return fmt.Errorf("error creating LDAP session: %s", err)
