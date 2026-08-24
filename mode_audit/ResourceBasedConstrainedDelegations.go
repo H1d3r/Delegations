@@ -1,4 +1,4 @@
-package mode_find
+package mode_audit
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"github.com/TheManticoreProject/winacl/securitydescriptor"
 )
 
-// FindRessourceBasedConstrainedDelegations retrieves resource-based constrained delegations for a given domain controller.
+// AuditResourceBasedConstrainedDelegations retrieves resource-based constrained delegations for a given domain controller.
 //
 // Parameters:
 //
@@ -24,9 +24,11 @@ import (
 // Returns:
 //
 //	An error if the operation fails, nil otherwise.
-func FindRessourceBasedConstrainedDelegations(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, debug bool) error {
-	ldapSession := ldap.Session{}
-	ldapSession.InitSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
+func AuditResourceBasedConstrainedDelegations(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, debug bool) error {
+	ldapSession, err := ldap.NewSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
+	if err != nil {
+		return fmt.Errorf("error creating LDAP session: %s", err)
+	}
 	success, err := ldapSession.Connect()
 	if !success {
 		return fmt.Errorf("error connecting to LDAP: %s", err)
@@ -40,7 +42,7 @@ func FindRessourceBasedConstrainedDelegations(ldapHost string, ldapPort int, cre
 		// Searching for the object with the given distinguished name
 		query += fmt.Sprintf("(distinguishedName=%s)", utils.EscapeLDAPFilterValue(distinguishedName))
 	}
-	// Querying the msDS-AllowedToActOnBehalfOfOtherIdentity attribute
+	// Searching for non empty msDS-AllowedToActOnBehalfOfOtherIdentity attribute
 	query += "(msDS-AllowedToActOnBehalfOfOtherIdentity=*)"
 	// Closing the first AND
 	query += ")"
@@ -89,7 +91,7 @@ func FindRessourceBasedConstrainedDelegations(ldapHost string, ldapPort int, cre
 				}
 
 				sidString := ace.Identity.SID.ToString()
-				distingushedName, err := utils.LookupSID(&ldapSession, sidString)
+				distingushedName, err := utils.LookupSID(ldapSession, sidString)
 
 				// Format the string depending on if the SID lookup failed or not
 				var formattedString string
@@ -106,6 +108,7 @@ func FindRessourceBasedConstrainedDelegations(ldapHost string, ldapPort int, cre
 					logger.Print("          " + formattedString)
 				}
 			}
+
 		}
 		logger.Print("")
 	} else {

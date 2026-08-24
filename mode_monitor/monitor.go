@@ -46,8 +46,10 @@ func (state DelegationState) hasDelegation() bool {
 //	Returns:
 //		nil
 func MonitorDelegations(domainController string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, debug bool) error {
-	ldapSession := ldap.Session{}
-	ldapSession.InitSession(domainController, ldapPort, creds, useLdaps, useKerberos)
+	ldapSession, err := ldap.NewSession(domainController, ldapPort, creds, useLdaps, useKerberos)
+	if err != nil {
+		return fmt.Errorf("error creating LDAP session: %s", err)
+	}
 	success, err := ldapSession.Connect()
 	if !success {
 		return fmt.Errorf("error connecting to LDAP: %s", err)
@@ -111,8 +113,10 @@ func MonitorDelegations(domainController string, ldapPort int, creds *credential
 	for {
 		<-pollingTicker.C
 
-		ldapSession := ldap.Session{}
-		ldapSession.InitSession(domainController, ldapPort, creds, useLdaps, useKerberos)
+		ldapSession, err := ldap.NewSession(domainController, ldapPort, creds, useLdaps, useKerberos)
+		if err != nil {
+			return fmt.Errorf("error creating LDAP session: %s", err)
+		}
 		success, err := ldapSession.Connect()
 		if !success {
 			return fmt.Errorf("error connecting to LDAP: %s", err)
@@ -229,7 +233,7 @@ func MonitorDelegations(domainController string, ldapPort int, creds *credential
 				valuesAdded := []string{}
 				for _, sidString := range newDelegationMap[dn].msDSAllowedToActOnBehalfOfOtherIdentitySIDs {
 					if !slices.Contains(delegationMap[dn].msDSAllowedToActOnBehalfOfOtherIdentitySIDs, sidString) {
-						distinguishedName, err := utils.LookupSID(&ldapSession, sidString)
+						distinguishedName, err := utils.LookupSID(ldapSession, sidString)
 						if err != nil {
 							valuesAdded = append(valuesAdded, fmt.Sprintf("  │   │   │ \x1b[1;92m%s (Unknown SID)\x1b[0m", sidString))
 						} else {
@@ -250,7 +254,7 @@ func MonitorDelegations(domainController string, ldapPort int, creds *credential
 				valuesRemoved := []string{}
 				for _, oldSIDString := range delegationMap[dn].msDSAllowedToActOnBehalfOfOtherIdentitySIDs {
 					if !slices.Contains(newDelegationMap[dn].msDSAllowedToActOnBehalfOfOtherIdentitySIDs, oldSIDString) {
-						distinguishedName, err := utils.LookupSID(&ldapSession, oldSIDString)
+						distinguishedName, err := utils.LookupSID(ldapSession, oldSIDString)
 						if err != nil {
 							valuesRemoved = append(valuesRemoved, fmt.Sprintf("  │   │   │ \x1b[1;91m%s (Unknown SID)\x1b[0m", oldSIDString))
 						} else {

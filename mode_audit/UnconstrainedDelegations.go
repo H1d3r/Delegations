@@ -46,8 +46,10 @@ func suspiciousUnconstrainedDelegationResults(searchResults []*goldap.Entry) []*
 //
 //	An error if the operation fails, nil otherwise.
 func AuditUnconstrainedDelegations(ldapHost string, ldapPort int, creds *credentials.Credentials, useLdaps bool, useKerberos bool, distinguishedName string, debug bool, ignoreLegitimate bool) error {
-	ldapSession := ldap.Session{}
-	ldapSession.InitSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
+	ldapSession, err := ldap.NewSession(ldapHost, ldapPort, creds, useLdaps, useKerberos)
+	if err != nil {
+		return fmt.Errorf("error creating LDAP session: %s", err)
+	}
 	success, err := ldapSession.Connect()
 	if !success {
 		return fmt.Errorf("error performing LDAP search: %s", err)

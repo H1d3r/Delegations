@@ -240,7 +240,7 @@ Usage: Delegations add <constrained|protocoltransition|rbcd|unconstrained>
 
    constrained         Add a constrained delegation to a computer, user or group.
    protocoltransition  Add a protocol transition to a computer, user or group.
-   rbcd                Add a ressource-based delegation to a computer, user or group.
+   rbcd                Add a resource-based delegation to a computer, user or group.
    unconstrained       Add a unconstrained delegation to a computer, user or group.
 ```
 
